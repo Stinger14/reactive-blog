@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
+import CommentCreate from './CommentCreate';
+import CommentList from './CommentList';
 
 export default () => {
     // define a state variable posts and initialize it as an empty object
@@ -27,6 +29,8 @@ export default () => {
             >
             <div className='card-body'>
                 <h3>{post.title}</h3>
+                <CommentList postId={post.id} />
+                <CommentCreate postId={post.id} />
             </div>
         </div>
     );
