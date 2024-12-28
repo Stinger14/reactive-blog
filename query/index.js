@@ -40,6 +40,8 @@ app.post('/events', (req, res) => {
     }
 
     console.log(posts);
+    console.log(data);
+    console.log('Received Event', req.body.type);
     res.send({});
 });
 
