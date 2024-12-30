@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json());
@@ -8,24 +9,7 @@ app.use(cors());
 
 const posts = {};
 
-// example of a post object
-// posts === {
-//     'y373j49': {
-//         id: 'y373j49',
-//         title: 'post title',
-//         comments: [
-//             { id: 'j4k3j4', content: 'comment!' }
-//         ]
-//     }
-// }
-
-app.get('/posts', (req, res) => {
-    res.send(posts);
-});
-
-app.post('/events', (req, res) => {
-    const { type, data } = req.body;
-
+const handleEvent = (type, data) => {
     if (type === 'PostCreated') {
         const { id, title } = data;
 
@@ -49,13 +33,44 @@ app.post('/events', (req, res) => {
         comment.status = status;
         comment.content = content;
     }
+}
 
-    console.log(posts);
-    console.log(data);
+// example of a post object
+// posts === {
+//     'y373j49': {
+//         id: 'y373j49',
+//         title: 'post title',
+//         comments: [
+//             { id: 'j4k3j4', content: 'comment!' }
+//         ]
+//     }
+// }
+
+app.get('/posts', (req, res) => {
+    res.send(posts);
+});
+
+app.post('/events', (req, res) => {
+    const { type, data } = req.body;
+
     console.log('Received Event', req.body.type);
+
+    handleEvent(type, data);
+
     res.send({});
 });
 
-app.listen(4002, () => {
+app.listen(4002, async () => {
     console.log('Listening on 4002');
+    try {
+        const res = await axios.get('http://localhost:4005/events');
+
+        for (let event of res.data) {
+            console.log('Processing event:', event.type);
+
+        handleEvent(event.type, event.data);
+        }
+    } catch (err) {
+        console.log(err);
+    }
 });
